@@ -20,40 +20,33 @@ const { dinosaurs, humans, movies } = require('./datasets/dinosaurs');
 
 // DATASET: kitties from ./datasets/kitties
 const kittyPrompts = {
-  orangePetNames() {
+  orangePetNames(dataset) {
     // Return an array of just the names of kitties who are orange e.g.
-        // ['Tiger', 'Snickers']
 
-        /* CODE GOES HERE */
+      return dataset.filter((pet) => pet.color === 'orange').map((pet) => pet.name);
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I wanted to get some practice chaining methods together,
+    //  so I decided to use filter to get the kitties with orange fur,
+    //  and then used map to change the array from objects to just the 'name' string
   },
 
-  sortByAge() {
+  sortByAge(dataset) {
     // Sort the kitties by their age
 
-    /* CODE GOES HERE */
+    return dataset.sort((a, b) => (b.age - a.age))
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Simple sort method usage
   },
 
-  growUp() {
+  growUp(dataset) {
     // Return an array of kitties who have all grown up by 2 years e.g.
-    // [{
-    //   name: 'Felicia',
-    //   age: 4,
-    //   color: 'grey'
-    // },
-    // {
-    //   name: 'Tiger',
-    //   age: 7,
-    //   color: 'orange'
-    // },
-    // ...etc]
 
-    /* CODE GOES HERE */
+    return dataset.map((pet) => {
+      pet.age += 2;
+      return pet
+    })
   }
 };
 
@@ -63,6 +56,7 @@ const kittyPrompts = {
 // they can perform the same utility
 // for the kitties or puppers datasets, depending on what arguments you send through.
 
+// Done
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -77,7 +71,7 @@ const kittyPrompts = {
 
 // DATASET: clubs from ./datasets/clubs
 const clubPrompts = {
-  membersBelongingToClubs() {
+  membersBelongingToClubs(clubs) {
     // Your function should access the clubs data through a parameter (it is being passed as an argument in the test file)
     // Create an object whose keys are the names of people, and whose values are
     // arrays that include the names of the clubs that person is a part of. e.g.
@@ -87,7 +81,15 @@ const clubPrompts = {
     //   ...etc
     // }
 
-    /* CODE GOES HERE */
+    return clubs.reduce((acc, curr) => {
+      curr.members.forEach(mem => {
+        if (!acc[mem]){
+          acc[mem] = []
+        }
+        acc[mem].push(curr.club)
+      })
+      return acc;
+    }, {})
 
     // Annotation:
     // Write your annotation here as a comment
@@ -115,17 +117,11 @@ const modPrompts = {
   studentsPerMod() {
     // Return an array of objects where the keys are mod (the number of the module)
     // and studentsPerInstructor (how many students per instructor there are for that mod) e.g.
-    // [
-    //   { mod: 1, studentsPerInstructor: 9 },
-    //   { mod: 2, studentsPerInstructor: 11 },
-    //   { mod: 3, studentsPerInstructor: 10 },
-    //   { mod: 4, studentsPerInstructor: 8 }
-    // ]
 
-    /* CODE GOES HERE */
+    return mods.map((mod) => ({mod: mod.mod, studentsPerInstructor: mod.students / mod.instructors }))
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Map can reformat each object to be a different object
   }
 };
 
@@ -156,7 +152,13 @@ const cakePrompts = {
     //    ..etc
     // ]
 
-    /* CODE GOES HERE */
+    return cakes.reduce((acc, curr, i) => {
+      acc.push({
+        flavor: curr.cakeFlavor,
+        inStock: curr.inStock
+      });
+      return acc;
+    },[])
 
     // Annotation:
     // Write your annotation here as a comment
@@ -183,17 +185,19 @@ const cakePrompts = {
     // ..etc
     // ]
 
-    /* CODE GOES HERE */
+    return cakes.filter(cake => cake.inStock)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Super simple filter disguised as a harder problem
   },
 
   totalInventory() {
     // Return the total amount of cakes in stock e.g.
     // 59
 
-    /* CODE GOES HERE */
+    return cakes.reduce((acc, curr) => {
+      return acc += curr.inStock;
+    }, 0)
 
     // Annotation:
     // Write your annotation here as a comment
@@ -204,7 +208,14 @@ const cakePrompts = {
     // every cake in the dataset e.g.
     // ['dutch process cocoa', 'toasted sugar', 'smoked sea salt', 'berries', ..etc]
 
-    /* CODE GOES HERE */
+    return cakes.reduce((acc, curr) => {
+      curr.toppings.forEach(top => {
+        if(!acc.includes(top)){
+          acc.push(top);
+        }
+      })
+      return acc;
+    }, [])
 
     // Annotation:
     // Write your annotation here as a comment
@@ -221,7 +232,15 @@ const cakePrompts = {
     //    ...etc
     // }
 
-    /* CODE GOES HERE */
+    return cakes.reduce((acc, curr) => {
+      curr.toppings.forEach(top => {
+        if(!acc[top]){
+          acc[top] = 0;
+        }
+        acc[top] += 1;
+      })
+      return acc;
+    }, {})
 
     // Annotation:
     // Write your annotation here as a comment
@@ -248,17 +267,11 @@ const cakePrompts = {
 const classPrompts = {
   feClassrooms() {
     // Create an array of just the front-end classrooms. e.g.
-    // [
-    //   { roomLetter: 'A', program: 'FE', capacity: 32 },
-    //   { roomLetter: 'C', program: 'FE', capacity: 27 },
-    //   { roomLetter: 'E', program: 'FE', capacity: 22 },
-    //   { roomLetter: 'G', program: 'FE', capacity: 29 }
-    // ]
 
-    /* CODE GOES HERE */
+    return classrooms.filter(room => room.program === 'FE')
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Filter is an easy choice for this one
   },
 
   totalCapacities() {
@@ -268,17 +281,20 @@ const classPrompts = {
     //   feCapacity: 110,
     //   beCapacity: 96
     // }
-
-    /* CODE GOES HERE */
+    return {
+      feCapacity: classrooms.filter(room => room.program === 'FE').map(room => room.capacity).reduce((acc, curr) =>  acc + curr),
+      beCapacity: classrooms.filter(room => room.program === 'BE').map(room => room.capacity).reduce((acc, curr) =>  acc + curr),
+    }
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I think this one could be done better, but I use filter to get only the FE or BE, map to get only the capacity,
+    //  and then reduce to combine all those together into one value
   },
 
   sortByCapacity() {
     // Return the array of classrooms sorted by their capacity (least capacity to greatest)
 
-    /* CODE GOES HERE */
+    return classrooms.sort((a, b) => a.capacity - b.capacity)
 
     // Annotation:
     // Write your annotation here as a comment
@@ -294,7 +310,7 @@ const classPrompts = {
 // DATASET: books from './datasets/books
 
 const bookPrompts = {
-  removeViolence() {
+  removeViolence(books) {
     // Your function should access the books data through a parameter (it is being passed as an argument in the test file)
     // return an array of all book titles that are not horror or true crime. Eg:
 
@@ -304,14 +320,13 @@ const bookPrompts = {
     //   'The Curious Incident of the Dog in the Night - Time', 'The Bell Jar',
     //   'Catch-22', 'Treasure Island']
 
-
-    /* CODE GOES HERE */
+    return books.filter(book => book.genre !== 'Horror' && book.genre !== 'True Crime').map(book => book.title)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Could use a reduce, but I chose just a filter into a map
 
   },
-  getNewBooks() {
+  getNewBooks(books) {
     // return an array of objects containing all books that were
     // published in the 90's and 00's. Inlucde the title and the year Eg:
 
@@ -319,7 +334,12 @@ const bookPrompts = {
     //  { title: 'Life of Pi', year: 2001 },
     //  { title: 'The Curious Incident of the Dog in the Night-Time', year: 2003 }]
 
-    /* CODE GOES HERE */
+    return books.filter(book => book.published >= 1990).map(book => {
+      return {
+        title: book.title, 
+        year: book.published
+      }
+    })
 
     // Annotation:
     // Write your annotation here as a comment
@@ -335,7 +355,12 @@ const bookPrompts = {
     //  { title: 'Life of Pi', year: 2001 },
     //  { title: 'The Curious Incident of the Dog in the Night-Time', year: 2003 }]
 
-    /* CODE GOES HERE */
+    return books.filter(book => book.published >= year).map(book => {
+      return {
+        title: book.title, 
+        year: book.published
+      }
+    })
 
     // Annotation:
     // Write your annotation here as a comment
@@ -357,10 +382,10 @@ const weatherPrompts = {
     // return an array of all the average temperatures. Eg:
     // [ 40, 40, 44.5, 43.5, 57, 35, 65.5, 62, 14, 46.5 ]
 
-    /* CODE GOES HERE */
+    return weather.map((area) => (area.temperature.high + area.temperature.low) / 2)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Map can return the average using dot notation
   },
 
   findSunnySpots() {
@@ -370,10 +395,11 @@ const weatherPrompts = {
     // 'New Orleans, Louisiana is sunny.',
     // 'Raleigh, North Carolina is mostly sunny.' ]
 
-    /* CODE GOES HERE */
+    return weather.filter((area) => area.type === 'sunny' || area.type === 'mostly sunny').map((area) => `${area.location} is ${area.type}.`);
 
     // Annotation:
-    // Write your annotation here as a comment
+    // We can chain filter and map to get the objects with the correct type,
+    //  and then change those objects to the correct strings, respectively
   },
 
   findHighestHumidity() {
@@ -385,10 +411,10 @@ const weatherPrompts = {
     //   temperature: { high: 49, low: 38 }
     // }
 
-    /* CODE GOES HERE */
+    return weather.reduce((acc, current) => acc.humidity > current.humidity ? acc : current)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Reduce can be used to find the object with the highest humidity property.
 
   }
 };
@@ -411,26 +437,28 @@ const nationalParksPrompts = {
     //   parksVisited: ["Rocky Mountain", "Acadia", "Zion"]
     //}
 
-    /* CODE GOES HERE */
+    return {
+      parksToVisit: nationalParks.filter(park => !park.visited).map(park => park.name),
+      parksVisited: nationalParks.filter(park => park.visited).map(park => park.name)
+    }
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Filter sorts the parks, and then map changes them to their name values
   },
 
   getParkInEachState() {
     // Return an array of objects where the key is the state and the value is its National Park
-    // eg: [ { Colorado: 'Rocky Mountain' },
-    // { Wyoming: 'Yellowstone' },
-    // { Montana: 'Glacier' },
-    // { Maine: 'Acadia' },
-    // { Utah: 'Zion' },
-    // { Florida: 'Everglades' } ]
 
+    return nationalParks.reduce((acc, curr, i) => {
+      acc.push({});
+      acc[i][curr.location] = curr.name;
+      return acc;
+    }, [])
 
-    /* CODE GOES HERE */
 
     // Annotation:
-    // Write your annotation here as a comment
+    // ForEach can be used to create objects using properties given,
+    //  and then a pre-created 'parkList' can be updated to return
   },
 
   getParkActivities() {
@@ -449,8 +477,15 @@ const nationalParksPrompts = {
     //   'backpacking',
     //   'rock climbing' ]
 
-    /* CODE GOES HERE */
-
+   return nationalParks.reduce((acc, curr) => {
+      curr.activities.forEach(act => {
+        if(!acc.includes(act)) {
+          acc.push(act)
+        }
+      })
+      return acc;
+    }, [])
+  
     // Annotation:
     // Write your annotation here as a comment
   }
@@ -475,25 +510,20 @@ const breweryPrompts = {
     // Return the total beer count of all beers for every brewery e.g.
     // 40
 
-    /* CODE GOES HERE */
+    return breweries.map((place) => (place.beers.length)).reduce((total, num) => total + num)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Map is used to get the length of each beer list, and reduce is used to combine them into one number.
   },
 
   getBreweryBeerCount() {
     // Return an array of objects where each object has the name of a brewery
     // and the count of the beers that brewery has e.g.
-    // [
-    //  { name: 'Little Machine Brew', beerCount: 12 },
-    //  { name: 'Ratio Beerworks', beerCount: 5},
-    // ...etc.
-    // ]
 
-    /* CODE GOES HERE */
+    return breweries.map((place) => ({ name: place.name, beerCount: place.beers.length }))
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Map can be used to return a new object using properties within each brewery object
   },
 
   getSingleBreweryBeerCount(breweryName) {
@@ -501,11 +531,12 @@ const breweryPrompts = {
     // brewery has e.g.
     // given 'Ratio Beerworks', return 5
 
-
-    /* CODE GOES HERE */
+    return breweries.find((brewery) => brewery.name === breweryName).beers.length
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Find lets us grab the object with the name specified, and .length gets us
+    //  how many beers they have
   },
 
   findHighestAbvBeer() {
@@ -513,10 +544,12 @@ const breweryPrompts = {
     // e.g.
     // { name: 'Barrel Aged Nature\'s Sweater', type: 'Barley Wine', abv: 10.9, ibu: 40 }
 
-    /* CODE GOES HERE */
+    return breweries.map((brewery) => brewery.beers.reduce((acc, curr) => acc.abv > curr.abv ? acc : curr )).reduce((acc, curr) => acc.abv > curr.abv ? acc : curr);
 
     // Annotation:
-    // Write your annotation here as a comment
+    // What a doozy. So initially we use map, with a nested reduce method,
+    //  to give change our array of breweries into an array of the highest abv per brewery,
+    //  then we use another reduce method to get the highest of those, and that returns the correct answer!
   }
 };
 
